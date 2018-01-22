@@ -19,7 +19,6 @@
 #include <yarp/sig/Matrix.h>
 #include <yarp/math/Math.h>
 
-#include <iCub/ctrl/math.h>
 #include <iCub/ctrl/pids.h>
 
 using namespace std;
@@ -231,4 +230,3 @@ int main(int argc, char *argv[])
     RobotModule robot;
     return robot.runModule(rf);
 }
-

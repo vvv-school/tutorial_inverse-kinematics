@@ -16,7 +16,7 @@ figure below:
 ![robot](/misc/robot.gif)
 
 ### Interacting with the controller
-Establish a RPC communication with the controller by doing:
+Once you launched the application in [**app/scripts**](/app/scripts), establish a RPC communication with the controller by doing:
 ```sh
 $ yarp rpc /tutorial_inverse-kinematics-controller/cmd:rpc
 ```
