@@ -1,0 +1,48 @@
+<application>
+
+  <name>Tutorial on Inverse Kinematics</name>
+
+  <dependencies>
+  </dependencies>
+
+  <module>
+      <name>tutorial_inverse-kinematics-robot</name>
+      <node>localhost</node>
+  </module>
+
+  <module>
+      <name>tutorial_inverse-kinematics-controller</name>
+      <node>localhost</node>
+  </module>
+
+  <module>
+      <name>yarpview</name>
+      <parameters>--name /environment --w 500 --h 500 --x 100 --y 50 --compact</parameters>
+      <node>localhost</node>
+  </module>
+
+  <connection>
+      <from>/tutorial_inverse-kinematics-robot/encoders:o</from>
+      <to>/tutorial_inverse-kinematics-controller/encoders:i</to>
+      <protocol>tcp</protocol>
+  </connection>
+
+  <connection>
+      <from>/tutorial_inverse-kinematics-controller/motors:o</from>
+      <to>/tutorial_inverse-kinematics-robot/motors:i</to>
+      <protocol>tcp</protocol>
+  </connection>
+
+  <connection>
+      <from>/tutorial_inverse-kinematics-controller/target:o</from>
+      <to>/tutorial_inverse-kinematics-robot/target:i</to>
+      <protocol>tcp</protocol>
+  </connection>
+
+  <connection>
+      <from>/tutorial_inverse-kinematics-robot/environment:o</from>
+      <to>/environment</to>
+      <protocol>tcp</protocol>
+  </connection>
+
+</application>
