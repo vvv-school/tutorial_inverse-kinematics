@@ -38,6 +38,7 @@ class Controller : public RFModule
     Vector target;
     Vector gains;
 
+    // compute the 2D position of the tip of the manipulator
     Vector forward_kinematics(const Vector &j) const
     {
         Vector ee(2);
@@ -46,6 +47,7 @@ class Controller : public RFModule
         return ee;
     }
 
+    // compute the Jacobian of the tip's position
     Matrix jacobian(const Vector &j) const
     {
         Matrix J(2,2);
@@ -65,9 +67,13 @@ public:
         portCmd.open("/tutorial_inverse-kinematics-controller/cmd:rpc");
         attach(portCmd);
 
+        // init the encoder values of the 2 joints
         encoders.resize(2,0.0);
+        
+        // init the target position
         target.resize(2,0.0);
 
+        // init some gains
         gains.resize(3,1.0);
         gains[0]=0.0004;
 
@@ -93,13 +99,16 @@ public:
 
     bool updateModule()override
     {
+        // update the encoder readouts from the net
         if (Vector *enc=portEncoders.read(false))
             encoders=*enc;
 
+        // compute quantities for differential kinematics
         Vector ee=forward_kinematics(encoders);
         Matrix J=jacobian(encoders);
         Vector err=target-ee;
-
+       
+        // solve the task
         Vector &vel=portMotors.prepare();
         if (mode=="t")
         {
@@ -121,14 +130,19 @@ public:
         {
             vel.resize(2,0.0);
         }
+        
+        // deliver the computed velocities to the actuators
         portMotors.writeStrict();
 
+        // send the target for visualization purpose
         portTarget.prepare()=target;
         portTarget.writeStrict();
 
         return true;
     }
 
+    // this service handles the RPC requests for changing the mode
+    // as well as the target positions and gains
     bool respond(const Bottle &command, Bottle &reply)override
     {
         string cmd=command.get(0).asString();
