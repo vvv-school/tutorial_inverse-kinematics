@@ -7,6 +7,8 @@
 #include <cmath>
 
 #include <yarp/os/Network.h>
+#include <yarp/os/LockGuard.h>
+#include <yarp/os/Mutex.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/ResourceFinder.h>
@@ -18,10 +20,13 @@
 #include <yarp/math/Math.h>
 #include <yarp/math/SVD.h>
 
+#include <iCub/ctrl/minJerkCtrl.h>
+
 using namespace std;
 using namespace yarp::os;
 using namespace yarp::sig;
 using namespace yarp::math;
+using namespace iCub::ctrl;
 
 
 class Controller : public RFModule
@@ -32,11 +37,16 @@ class Controller : public RFModule
     BufferedPort<Vector> portMotors;
     BufferedPort<Vector> portEncoders;
     BufferedPort<Vector> portTarget;
+    BufferedPort<Vector> portTipVel;
     RpcServer portCmd;
 
+    Mutex mutex;
     Vector encoders;
     Vector target;
     Vector gains;
+
+    bool usePlanner;
+    minJerkTrajGen *planner;
 
     // compute the 2D position of the tip of the manipulator
     Vector forward_kinematics(const Vector &j) const
@@ -64,19 +74,27 @@ public:
         portMotors.open("/tutorial_inverse-kinematics-controller/motors:o");
         portEncoders.open("/tutorial_inverse-kinematics-controller/encoders:i");
         portTarget.open("/tutorial_inverse-kinematics-controller/target:o");
+        portTipVel.open("/tutorial_inverse-kinematics-controller/tip-vel:o");
         portCmd.open("/tutorial_inverse-kinematics-controller/cmd:rpc");
         attach(portCmd);
 
         // init the encoder values of the 2 joints
-        encoders.resize(2,0.0);
-        
+        encoders=zeros(2);
+
         // init the target position
-        target.resize(2,0.0);
+        target=zeros(2);
 
-        // init some gains
-        gains.resize(3,1.0);
+        // init gains
+        gains.resize(3);
         gains[0]=0.0004;
+        gains[1]=1.0;
+        gains[2]=2.0;
 
+        // init planner
+        planner=new minJerkTrajGen(target,getPeriod(),4.0);
+        usePlanner=false;
+
+        // init mode
         mode="idle";
 
         return true;
@@ -84,9 +102,12 @@ public:
 
     bool close()override
     {
+        delete planner;
+
         portMotors.close();
         portEncoders.close();
         portTarget.close();
+        portTipVel.close();
         portCmd.close();
 
         return true;
@@ -99,15 +120,24 @@ public:
 
     bool updateModule()override
     {
+        // protect against race conditions
+        LockGuard lg(mutex);
+
         // update the encoder readouts from the net
         if (Vector *enc=portEncoders.read(false))
             encoders=*enc;
 
+        // plan target trajectory
+        planner->computeNextValues(target);
+
+        // select desired end-effector position
+        Vector ee_d=(usePlanner?planner->getPos():target);
+
         // compute quantities for differential kinematics
         Vector ee=forward_kinematics(encoders);
         Matrix J=jacobian(encoders);
-        Vector err=target-ee;
-       
+        Vector err=ee_d-ee;
+
         // solve the task
         Vector &vel=portMotors.prepare();
         if (mode=="t")
@@ -128,14 +158,19 @@ public:
         }
         else
         {
-            vel.resize(2,0.0);
+            vel=zeros(2);
         }
-        
+
         // deliver the computed velocities to the actuators
         portMotors.writeStrict();
 
+        // provide magnitude of tip Cartesian velocity
+        // for visualization purpose 
+        portTipVel.prepare()=norm(J*vel)*ones(1);
+        portTipVel.writeStrict();
+
         // send the target for visualization purpose
-        portTarget.prepare()=target;
+        portTarget.prepare()=ee_d;
         portTarget.writeStrict();
 
         return true;
@@ -145,6 +180,9 @@ public:
     // as well as the target positions and gains
     bool respond(const Bottle &command, Bottle &reply)override
     {
+        // protect against race conditions
+        LockGuard lg(mutex);
+
         string cmd=command.get(0).asString();
         if (cmd=="mode")
         {
@@ -173,6 +211,21 @@ public:
             }
 
             reply.addString("invalid target");
+        }
+        else if (cmd=="planner")
+        {
+            if (command.size()>1)
+            {
+                string new_mode=command.get(1).asString();
+                if ((new_mode=="on") || (new_mode=="off"))
+                {
+                    usePlanner=(new_mode=="on");
+                    reply.addString("ok");
+                    return true;
+                }
+            }
+
+            reply.addString("invalid mode");
         }
         else if (cmd=="gain")
         {

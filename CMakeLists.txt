@@ -41,7 +41,7 @@ install(TARGETS ${PROJECT_NAME}-robot DESTINATION bin)
 
 # controller
 add_executable(${PROJECT_NAME}-controller ${CMAKE_SOURCE_DIR}/src/controller.cpp)
-target_link_libraries(${PROJECT_NAME}-controller ${YARP_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}-controller ${YARP_LIBRARIES} ctrlLib)
 install(TARGETS ${PROJECT_NAME}-controller DESTINATION bin)
 
 # generate ad-hoc project to perform "make uninstall"
@@ -49,3 +49,4 @@ icubcontrib_add_uninstall_target()
 
 file(GLOB scripts ${CMAKE_SOURCE_DIR}/app/scripts/*.xml)
 yarp_install(FILES ${scripts} DESTINATION ${ICUBCONTRIB_APPLICATIONS_INSTALL_DIR})
+

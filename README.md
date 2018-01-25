@@ -15,6 +15,8 @@ figure below:
 
 ![robot](/misc/robot.gif)
 
+Finally, we will also see the advantages of relying on **trajectory planning**.
+
 ### Interacting with the controller
 Once you launched the application in [**app/scripts**](/app/scripts), establish a RPC communication with the controller by doing:
 ```sh
@@ -36,5 +38,11 @@ where `m` is a string specifying the new mode among the following options:
 - `inv` for the Jacobian (Pseudo-)inverse
 - `dls` for the Damped Least Squares
 - `idle` for putting the controller in idle.
+
+#### Changing planner mode
+```sh
+>> planner `m`
+```
+where `m` can be `on` or `off`.
 
 # [How to complete the assignment](https://github.com/vvv-school/vvv-school.github.io/blob/master/instructions/how-to-complete-assignments.md)
