@@ -17,7 +17,7 @@ figure below:
 
 Finally, we will also see the advantages of relying on **trajectory planning**.
 
-### Interacting with the controller
+### How to interact with the controller
 Once you launched the application in [**app/scripts**](/app/scripts), establish a RPC communication with the controller by doing:
 ```sh
 $ yarp rpc /tutorial_inverse-kinematics-controller/cmd:rpc
