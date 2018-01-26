@@ -8,7 +8,7 @@ Inverse Kinematics (IK) problem.
 
 In particular, we explore the pros and cons of the following algorithms for
 the Differential IK applied to the **2-links serial manipulator** shown in the
-figure below:
+animation below:
 - **Jacobian Transpose**
 - **Jacobian (Pseudo-)inverse**
 - **Damped Least Squares**
@@ -22,6 +22,7 @@ Once you launched the application in [**app/scripts**](/app/scripts), establish 
 ```sh
 $ yarp rpc /tutorial_inverse-kinematics-controller/cmd:rpc
 ```
+Then, you can operate through the commands listed below.
 
 #### Changing target position
 ```sh
