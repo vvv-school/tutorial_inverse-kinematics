@@ -25,16 +25,15 @@ include(ICUBcontribOptions)
 # specify to install in $ICUBcontrib_DIR/bin
 icubcontrib_set_default_prefix()
 
-# import math symbols from standard cmath
-add_definitions(-D_USE_MATH_DEFINES)
-
 # robot
 add_executable(${PROJECT_NAME}-robot ${CMAKE_SOURCE_DIR}/src/robot.cpp)
+target_compile_definitions(${PROJECT_NAME}-robot PRIVATE _USE_MATH_DEFINES)
 target_link_libraries(${PROJECT_NAME}-robot ${YARP_LIBRARIES} ctrlLib ${OpenCV_LIBRARIES})
 install(TARGETS ${PROJECT_NAME}-robot DESTINATION bin)
 
 # controller
 add_executable(${PROJECT_NAME}-controller ${CMAKE_SOURCE_DIR}/src/controller.cpp)
+target_compile_definitions(${PROJECT_NAME}-controller PRIVATE _USE_MATH_DEFINES)
 target_link_libraries(${PROJECT_NAME}-controller ${YARP_LIBRARIES} ctrlLib)
 install(TARGETS ${PROJECT_NAME}-controller DESTINATION bin)
 
