@@ -18,6 +18,7 @@
 #include <yarp/sig/Vector.h>
 #include <yarp/sig/Matrix.h>
 #include <yarp/math/Math.h>
+#include <yarp/cv/Cv.h>
 
 #include <iCub/ctrl/pids.h>
 
@@ -25,6 +26,7 @@ using namespace std;
 using namespace yarp::os;
 using namespace yarp::sig;
 using namespace yarp::math;
+using namespace yarp::cv;
 using namespace iCub::ctrl;
 
 
@@ -83,7 +85,7 @@ public:
         }
         vector<vector<cv::Point>> poly(1,pts);
 
-        cv::Mat imgMat=cv::cvarrToMat(img.getIplImage());
+        cv::Mat imgMat=toCvMat(img);
         cv::fillPoly(imgMat,poly,cv::Scalar(96,176,224));
         cv::circle(imgMat,pts[0],4,cv::Scalar(0,255,0),CV_FILLED);
         cv::circle(imgMat,pts[3],4,cv::Scalar(0,255,0),CV_FILLED);
@@ -195,7 +197,7 @@ public:
         ImageOf<PixelRgb> &env=portEnvironment.prepare();
         env.resize(env_edge,env_edge); env.zero();
 
-        cv::Mat imgMat=cv::cvarrToMat(env.getIplImage());
+        cv::Mat imgMat=toCvMat(env);
         cv::circle(imgMat,repoint(env,target),5,cv::Scalar(255,0,0),CV_FILLED);
 
         robot->move(velocity,env);
