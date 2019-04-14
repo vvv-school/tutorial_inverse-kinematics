@@ -30,10 +30,10 @@ using namespace yarp::cv;
 using namespace iCub::ctrl;
 
 
-cv::Point repoint(const ImageOf<PixelRgb> &img, const Vector &p)
+cv::Point repoint(cv::Mat &imgMat, const Vector &p)
 {
-    return cv::Point((int)(img.width()/2.0+p[0]),
-                     (int)(img.height()/2.0-p[1]));
+    return cv::Point((int)(imgMat.size().width/2.0+p[0]),
+                     (int)(imgMat.size().height/2.0-p[1]));
 }
 
 
@@ -67,7 +67,7 @@ public:
         points[5][1]=-height/2.0;
     }
 
-    Matrix draw(const Matrix &H, const double joint, ImageOf<PixelRgb> &img) const
+    Matrix draw(const Matrix &H, const double joint, cv::Mat &imgMat) const
     {
         double c=cos(joint);
         double s=sin(joint);
@@ -81,11 +81,10 @@ public:
         for (auto &point:points)
         {
             Vector p=H_*point;
-            pts.push_back(repoint(img,p));
+            pts.push_back(repoint(imgMat,p));
         }
         vector<vector<cv::Point>> poly(1,pts);
 
-        cv::Mat imgMat=toCvMat(img);
         cv::fillPoly(imgMat,poly,cv::Scalar(96,176,224));
         cv::circle(imgMat,pts[0],4,cv::Scalar(0,255,0),CV_FILLED);
         cv::circle(imgMat,pts[3],4,cv::Scalar(0,255,0),CV_FILLED);
@@ -113,8 +112,10 @@ public:
     {
         Matrix H=eye(3,3);
         joints->integrate(velocity);
+
+        cv::Mat imgMat=toCvMat(img);
         for (int i=0; i<links.size(); i++)
-            H=links[i].draw(H,joints->get()[i],img);
+            H=links[i].draw(H,joints->get()[i],imgMat);
     }
 
     Vector getJoints() const
@@ -198,7 +199,7 @@ public:
         env.resize(env_edge,env_edge); env.zero();
 
         cv::Mat imgMat=toCvMat(env);
-        cv::circle(imgMat,repoint(env,target),5,cv::Scalar(255,0,0),CV_FILLED);
+        cv::circle(imgMat,repoint(imgMat,target),5,cv::Scalar(0,0,255),CV_FILLED);
 
         robot->move(velocity,env);
 
