@@ -3,12 +3,12 @@
 // Author: Ugo Pattacini - <ugo.pattacini@iit.it>
 
 #include <cstdlib>
+#include <mutex>
 #include <string>
 #include <cmath>
 
 #include <yarp/os/Network.h>
 #include <yarp/os/LockGuard.h>
-#include <yarp/os/Mutex.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/ResourceFinder.h>
@@ -40,7 +40,7 @@ class Controller : public RFModule
     BufferedPort<Vector> portTipVel;
     RpcServer portCmd;
 
-    Mutex mutex;
+    mutex mtx;
     Vector encoders;
     Vector target;
     Vector gains;
@@ -121,7 +121,7 @@ public:
     bool updateModule()override
     {
         // protect against race conditions
-        LockGuard lg(mutex);
+        lock_guard<mutex> lg(mtx);
 
         // update the encoder readouts from the net
         if (Vector *enc=portEncoders.read(false))
@@ -181,7 +181,7 @@ public:
     bool respond(const Bottle &command, Bottle &reply)override
     {
         // protect against race conditions
-        LockGuard lg(mutex);
+        lock_guard<mutex> lg(mtx);
 
         string cmd=command.get(0).asString();
         if (cmd=="mode")
