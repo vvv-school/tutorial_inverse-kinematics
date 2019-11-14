@@ -1,6 +1,8 @@
 Tutorial on Inverse Kinematics
 ==============================
 
+[![Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://www.gitpod.io/docs/10_getting_started)
+
 # Tutorial
 With this code example, we aim to guide you through the theory and the practical
 implementation of those methods that are traditionally employed to solve the
