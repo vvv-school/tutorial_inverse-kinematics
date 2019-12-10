@@ -5,5 +5,5 @@ ports:
 - port: 10000-20000
   onOpen: ignore
 tasks:
+- init: init-icubcontrib.sh
 - command: start-vnc-session.sh
-- command: tmux
