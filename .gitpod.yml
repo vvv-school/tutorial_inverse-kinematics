@@ -4,6 +4,7 @@ ports:
   onOpen: notify
 - port: 10000-20000
   onOpen: ignore
+workspaceLocation: "."
 tasks:
 - init: init-icubcontrib.sh
 - command: start-vnc-session.sh
