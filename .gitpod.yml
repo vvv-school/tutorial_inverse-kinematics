@@ -7,3 +7,4 @@ ports:
 tasks:
 - init: init-icubcontrib.sh
 - command: start-vnc-session.sh
+- command: gp url
