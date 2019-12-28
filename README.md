@@ -15,7 +15,7 @@ animation below:
 - **Jacobian (Pseudo-)inverse**
 - **Damped Least Squares**
 
-![robot](/misc/robot.gif)
+![robot](/assets/robot.gif)
 
 Finally, we will also see the advantages of relying on **trajectory planning**.
 
