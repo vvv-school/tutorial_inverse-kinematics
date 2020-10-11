@@ -13,7 +13,6 @@ find_package(YARP 3.3.0 REQUIRED COMPONENTS os sig math cv)
 find_package(ICUB REQUIRED)
 
 # extend the current search path used by cmake to load helpers
-list(APPEND CMAKE_MODULE_PATH ${ICUB_MODULE_PATH})
 list(APPEND CMAKE_MODULE_PATH ${ICUBCONTRIB_MODULE_PATH})
 
 find_package(OpenCV REQUIRED)
