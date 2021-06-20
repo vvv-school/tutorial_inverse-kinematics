@@ -1,7 +1,7 @@
 Tutorial on Inverse Kinematics
 ==============================
 
-[![Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/vvv-school/tutorial_inverse-kinematics)
+[![Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer)
 
 # Tutorial
 With this code example, we aim to guide you through the theory and the practical
