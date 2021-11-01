@@ -21,19 +21,19 @@ Finally, we will also see the advantages of relying on **trajectory planning**.
 
 ### How to interact with the controller
 Once you launched the application in [**app/scripts**](/app/scripts), establish a RPC communication with the controller by doing:
-```sh
-$ yarp rpc /tutorial_inverse-kinematics-controller/cmd:rpc
+```console
+yarp rpc /tutorial_inverse-kinematics-controller/cmd:rpc
 ```
 Then, you can operate through the commands listed below.
 
 #### Changing target position
-```sh
+```console
 >> target x y
 ```
 where `x` and `y` are the new Cartesian coordinates of the target in the range **[-250,250]**.
 
 #### Changing IK algorithm
-```sh
+```console
 >> mode m
 ```
 where `m` is a string specifying the new mode among the following options:
@@ -43,8 +43,8 @@ where `m` is a string specifying the new mode among the following options:
 - `idle` for putting the controller in idle.
 
 #### Changing planner mode
-```sh
->> planner `m`
+```console
+>> planner m
 ```
 where `m` can be `on` or `off`.
 
