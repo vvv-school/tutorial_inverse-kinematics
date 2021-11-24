@@ -147,9 +147,9 @@ class RobotModule : public RFModule
 public:
     bool configure(ResourceFinder &rf)override
     {
-        int dof=rf.check("dof",Value(2)).asInt();
-        double link_length=rf.check("link-length",Value(100.0)).asDouble();
-        env_edge=rf.check("environment-edge",Value(500)).asInt();
+        int dof=rf.check("dof",Value(2)).asInt32();
+        double link_length=rf.check("link-length",Value(100.0)).asFloat64();
+        env_edge=rf.check("environment-edge",Value(500)).asInt32();
 
         robot=new Robot(dof,link_length,getPeriod());
 
@@ -185,14 +185,14 @@ public:
         if (Bottle *vel=portMotors.read(false))
             if (vel->size()>=(int)velocity.length())
                 for (int i=0; i<vel->size(); i++)
-                    velocity[i]=vel->get(i).asDouble();
+                    velocity[i]=vel->get(i).asFloat64();
 
         if (Bottle *tar=portTarget.read(false))
         {
             if (tar->size()>=2)
             {
-                target[0]=tar->get(0).asDouble();
-                target[1]=tar->get(1).asDouble();
+                target[0]=tar->get(0).asFloat64();
+                target[1]=tar->get(1).asFloat64();
             }
         }
 
@@ -209,7 +209,7 @@ public:
         encoders.clear();
 
         for (int i=0; i<(int)joints.length(); i++)
-            encoders.addDouble(joints[i]);
+            encoders.addFloat64(joints[i]);
 
         portEnvironment.writeStrict();
         portEncoders.writeStrict();

@@ -69,7 +69,7 @@ class Controller : public RFModule
 public:
     bool configure(ResourceFinder &rf)override
     {
-        link_length=rf.check("link-length",Value(100.0)).asDouble();
+        link_length=rf.check("link-length",Value(100.0)).asFloat64();
 
         portMotors.open("/tutorial_inverse-kinematics-controller/motors:o");
         portEncoders.open("/tutorial_inverse-kinematics-controller/encoders:i");
@@ -204,8 +204,8 @@ public:
         {
             if (command.size()>2)
             {
-                target[0]=command.get(1).asDouble();
-                target[1]=command.get(2).asDouble();
+                target[0]=command.get(1).asFloat64();
+                target[1]=command.get(2).asFloat64();
                 reply.addString("ok");
                 return true;
             }
@@ -231,7 +231,7 @@ public:
         {
             if (command.size()>1)
             {
-                double g=command.get(1).asDouble();
+                double g=command.get(1).asFloat64();
                 if (mode=="t")
                     gains[0]=g;
                 else if (mode=="inv")
