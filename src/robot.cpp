@@ -124,7 +124,7 @@ public:
         if (visu_on) {
             if (trajectory.size() >= VEC_SIZE) {
                 trajectory.erase(trajectory.begin(),trajectory.begin()+VEC_SIZE/100);
-                yWarning("1/100 of trajectory data were removed to prevent excessive vector growth!");
+                yWarning()<<"1/100 of trajectory data were removed to prevent excessive vector growth!";
             }
             trajectory.push_back(Vector{H(0,2),H(1,2)});
             for (auto& traj:trajectory) {
