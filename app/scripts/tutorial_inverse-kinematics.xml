@@ -61,6 +61,12 @@
       <to>/tutorial_inverse-kinematics-robot/target:i</to>
       <protocol>tcp</protocol>
   </connection>
+  
+  <connection>
+      <from>/tutorial_inverse-kinematics-controller/visu:o</from>
+      <to>/tutorial_inverse-kinematics-robot/visu:i</to>
+      <protocol>tcp</protocol>
+  </connection>
 
   <connection>
       <from>/tutorial_inverse-kinematics-robot/environment:o</from>

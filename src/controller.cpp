@@ -38,12 +38,14 @@ class Controller : public RFModule
     BufferedPort<Vector> portEncoders;
     BufferedPort<Vector> portTarget;
     BufferedPort<Vector> portTipVel;
+    BufferedPort<Vector> portVisu;
     RpcServer portCmd;
 
     mutex mtx;
     Vector encoders;
     Vector target;
     Vector gains;
+    double k;
 
     bool usePlanner;
     minJerkTrajGen *planner;
@@ -75,6 +77,7 @@ public:
         portEncoders.open("/tutorial_inverse-kinematics-controller/encoders:i");
         portTarget.open("/tutorial_inverse-kinematics-controller/target:o");
         portTipVel.open("/tutorial_inverse-kinematics-controller/tip-vel:o");
+        portVisu.open("/tutorial_inverse-kinematics-controller/visu:o");
         portCmd.open("/tutorial_inverse-kinematics-controller/cmd:rpc");
         attach(portCmd);
 
@@ -89,6 +92,7 @@ public:
         gains[0]=0.0004;
         gains[1]=1.0;
         gains[2]=2.0;
+        k=10.0;
 
         // init planner
         planner=new minJerkTrajGen(target,getPeriod(),4.0);
@@ -107,6 +111,7 @@ public:
         portMotors.close();
         portEncoders.close();
         portTarget.close();
+        portVisu.close();
         portTipVel.close();
         portCmd.close();
 
@@ -152,7 +157,6 @@ public:
         }
         else if (mode=="dls")
         {
-            double k=10.0;
             Matrix G=gains[2]*eye(2,2);
             vel=J.transposed()*pinv(J*J.transposed()+k*k*eye(2,2))*G*err;
         }
@@ -236,14 +240,29 @@ public:
                     gains[0]=g;
                 else if (mode=="inv")
                     gains[1]=g;
-                else if (mode=="dls")
+                else if (mode=="dls") {
                     gains[2]=g;
+                    k=command.get(2).asFloat64();
+                }
 
                 reply.addString("ok");
                 return true;
             }
 
             reply.addString("invalid gain");
+        }
+        else if (cmd=="visu")
+        {
+            if (command.size()>1)
+            {
+                int v=command.get(1).asInt32();
+                portVisu.prepare()=v*ones(1);
+                portVisu.writeStrict();
+                reply.addString("ok");
+                return true;
+            }
+
+            reply.addString("invalid visu command");
         }
         else
             reply.addString("invalid command");

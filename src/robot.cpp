@@ -23,6 +23,8 @@
 
 #include <iCub/ctrl/pids.h>
 
+#define VEC_SIZE 1000
+
 using namespace std;
 using namespace yarp::os;
 using namespace yarp::sig;
@@ -100,6 +102,7 @@ class Robot
 {
     vector<Link> links;
     Integrator *joints;
+    vector<Vector> trajectory;
 
 public:
     Robot(const int n, const double length, const double Ts)
@@ -107,9 +110,10 @@ public:
         for (int i=0; i<n; i++)
             links.push_back(Link(length));
         joints=new Integrator(Ts,Vector(n,0.0));
+        trajectory = {};
     }
 
-    void move(const Vector &velocity, ImageOf<PixelRgb> &img)
+    void move(const Vector &velocity, ImageOf<PixelRgb> &img, bool visu_on)
     {
         Matrix H=eye(3,3);
         joints->integrate(velocity);
@@ -117,6 +121,21 @@ public:
         cv::Mat imgMat=toCvMat(img);
         for (int i=0; i<links.size(); i++)
             H=links[i].draw(H,joints->get()[i],imgMat);
+        if (visu_on) {
+            if (trajectory.size() >= VEC_SIZE) {
+                trajectory.erase(trajectory.begin(),trajectory.begin()+VEC_SIZE/100);
+                yWarning()<<"1/100 of trajectory data were removed to prevent excessive vector growth!";
+            }
+            trajectory.push_back(Vector{H(0,2),H(1,2)});
+            for (auto& traj:trajectory) {
+                cv::circle(imgMat,repoint(imgMat,traj),4,cv::Scalar(255,255,0),cv::FILLED);
+            }
+        }
+    }
+
+    void clearTrajectory() 
+    {
+        trajectory.clear();
     }
 
     Vector getJoints() const
@@ -139,10 +158,13 @@ class RobotModule : public RFModule
     BufferedPort<Bottle> portMotors;
     BufferedPort<Bottle> portEncoders;
     BufferedPort<Bottle> portTarget;
+    BufferedPort<Bottle> portVisu;
+    
 
     Vector velocity;
     Vector target;
     int env_edge;
+    bool visu_on;
 
 public:
     bool configure(ResourceFinder &rf)override
@@ -157,7 +179,9 @@ public:
         portMotors.open("/tutorial_inverse-kinematics-robot/motors:i");
         portEncoders.open("/tutorial_inverse-kinematics-robot/encoders:o");
         portTarget.open("/tutorial_inverse-kinematics-robot/target:i");
+        portVisu.open("/tutorial_inverse-kinematics-robot/visu:i");
 
+        visu_on = false;
         velocity.resize(dof,0.0);
         target.resize(2,0.0);
         return true;
@@ -171,6 +195,7 @@ public:
         portMotors.close();
         portEncoders.close();
         portTarget.close();
+        portVisu.close();
 
         return true;
     }
@@ -195,6 +220,19 @@ public:
                 target[1]=tar->get(1).asFloat64();
             }
         }
+        if (Bottle *vis=portVisu.read(false)) 
+        {
+            int value = vis->get(0).asInt32();
+            if (value == 2)
+                robot->clearTrajectory();
+            else if (value == 1)
+                visu_on = true;
+            else if (value == 0) {
+                visu_on = false;
+                robot->clearTrajectory();
+            }
+
+        }
 
         ImageOf<PixelRgb> &env=portEnvironment.prepare();
         env.resize(env_edge,env_edge); env.zero();
@@ -202,7 +240,7 @@ public:
         cv::Mat imgMat=toCvMat(env);
         cv::circle(imgMat,repoint(imgMat,target),5,cv::Scalar(0,0,255),cv::FILLED);
 
-        robot->move(velocity,env);
+        robot->move(velocity,env, visu_on);
 
         Vector joints=robot->getJoints();
         Bottle &encoders=portEncoders.prepare();
