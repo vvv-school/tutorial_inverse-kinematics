@@ -92,7 +92,7 @@ public:
         gains[0]=0.0004;
         gains[1]=1.0;
         gains[2]=2.0;
-        k=10;
+        k=10.0;
 
         // init planner
         planner=new minJerkTrajGen(target,getPeriod(),4.0);

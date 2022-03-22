@@ -23,6 +23,8 @@
 
 #include <iCub/ctrl/pids.h>
 
+#define VEC_SIZE 1000
+
 using namespace std;
 using namespace yarp::os;
 using namespace yarp::sig;
@@ -120,6 +122,10 @@ public:
         for (int i=0; i<links.size(); i++)
             H=links[i].draw(H,joints->get()[i],imgMat);
         if (visu_on) {
+            if (trajectory.size() >= VEC_SIZE) {
+                trajectory.erase(trajectory.begin(),trajectory.begin()+VEC_SIZE/100);
+                yWarning("1/100 of trajectory data were removed to prevent excessive vector growth!");
+            }
             trajectory.push_back(Vector{H(0,2),H(1,2)});
             for (auto& traj:trajectory) {
                 cv::circle(imgMat,repoint(imgMat,traj),4,cv::Scalar(255,255,0),cv::FILLED);
