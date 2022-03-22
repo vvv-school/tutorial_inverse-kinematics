@@ -15,12 +15,12 @@ animation below:
 - **Jacobian (Pseudo-)inverse**
 - **Damped Least Squares**
 
-![robot](/assets/robot.gif)
+![robot](assets/robot.gif)
 
 Finally, we will also see the advantages of relying on **trajectory planning**.
 
 ### How to interact with the controller
-Once you launched the application in [**app/scripts**](/app/scripts), establish a RPC communication with the controller by doing:
+Once you launched the application in [**app/scripts**](app/scripts), establish a RPC communication with the controller by doing:
 ```console
 yarp rpc /tutorial_inverse-kinematics-controller/cmd:rpc
 ```
@@ -47,5 +47,20 @@ where `m` is a string specifying the new mode among the following options:
 >> planner m
 ```
 where `m` can be `on` or `off`.
+
+#### Changing gain value
+```console
+>> gain g k
+```
+where `g` is gain value (K = g*eye(2)) and `k` is parameter in DLS method.
+
+#### Changing Trajectory visualization mode
+```console
+>> visu v
+```
+where `v` can be:
+- `0` to stop visualization
+- `1` to start visualization
+- `2` to clear visualization
 
 # [How to complete the assignment](https://github.com/vvv-school/vvv-school.github.io/blob/master/instructions/how-to-complete-assignments.md)
