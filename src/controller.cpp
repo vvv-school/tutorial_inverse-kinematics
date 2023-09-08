@@ -8,7 +8,6 @@
 #include <cmath>
 
 #include <yarp/os/Network.h>
-#include <yarp/os/LockGuard.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/ResourceFinder.h>
