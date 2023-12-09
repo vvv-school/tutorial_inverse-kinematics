@@ -27,7 +27,7 @@ icubcontrib_set_default_prefix()
 # robot
 add_executable(${PROJECT_NAME}-robot ${CMAKE_SOURCE_DIR}/src/robot.cpp)
 target_compile_definitions(${PROJECT_NAME}-robot PRIVATE _USE_MATH_DEFINES)
-target_link_libraries(${PROJECT_NAME}-robot ${YARP_LIBRARIES} ctrlLib ${OpenCV_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}-robot ${YARP_LIBRARIES} ctrlLib ${OpenCV_LIBS})
 install(TARGETS ${PROJECT_NAME}-robot DESTINATION bin)
 
 # controller
